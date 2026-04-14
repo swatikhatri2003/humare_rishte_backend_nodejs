@@ -20,7 +20,7 @@ router.use('/auth', authRoutes);
 router.use('/states', stateRoutes);
 router.use('/cities', cityRoutes);
 router.use('/communities', communityRoutes);
-router.use('/kutumbs', kutumbRoutes);
+router.use('/kutumb', kutumbRoutes);
 router.use('/members', memberRoutes);
 
 module.exports = router;

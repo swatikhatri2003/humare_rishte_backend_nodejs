@@ -59,7 +59,7 @@ function errorHandler(err, req, res, next) {
   console.error(err);
   return res.status(500).json({
     success: false,
-    message: 'Something went wrong on the server. Please try again later.',
+    message: 'Something went wrong on the server. Please try again later.',err,
   });
 }
 

@@ -45,28 +45,33 @@ exports.getById = asyncHandler(async (req, res) => {
 });
 
 exports.create = asyncHandler(async (req, res) => {
-  const payload = { ...req.body, user_id: req.userId };
+  const { kutumb_id: kutumbIdFromBody, ...bodyFields } = req.body;
+  const payload = { ...bodyFields, user_id: req.userId };
+  if (payload.status == null || payload.status === '') {
+    payload.status = 1;
+  }
+
+  if (kutumbIdFromBody != null && kutumbIdFromBody !== '') {
+    const kutumbId = Number(kutumbIdFromBody);
+    const row = await Kutumb.findByPk(kutumbId);
+    if (!row) {
+      throw new AppError('Kutumb not found.', 404);
+    }
+    if (row.user_id !== req.userId) {
+      throw new AppError('You can only update kutumb records that you created.', 403);
+    }
+    await row.update(payload);
+    return res.status(200).json({
+      success: true,
+      message: 'Kutumb updated successfully.',
+      data: { kutumb: row },
+    });
+  }
+
   const row = await Kutumb.create(payload);
   res.status(201).json({
     success: true,
     message: 'Kutumb created successfully.',
-    data: { kutumb: row },
-  });
-});
-
-exports.update = asyncHandler(async (req, res) => {
-  const row = await Kutumb.findByPk(req.params.kutumbId);
-  if (!row) {
-    throw new AppError('Kutumb not found.', 404);
-  }
-  if (row.user_id !== req.userId) {
-    throw new AppError('You can only update kutumb records that you created.', 403);
-  }
-
-  await row.update(req.body);
-  res.status(200).json({
-    success: true,
-    message: 'Kutumb updated successfully.',
     data: { kutumb: row },
   });
 });

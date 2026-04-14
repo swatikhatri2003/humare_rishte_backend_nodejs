@@ -5,9 +5,9 @@ const { stateIdParam, postStatesOrCitiesBody } = require('../validators/stateVal
 
 const router = express.Router();
 
-router.get('/', stateController.list);
+// router.get('/', stateController.list);
 router.post('/', postStatesOrCitiesBody, validateRequest, stateController.postListStatesOrCities);
-router.get('/:stateId/cities', stateIdParam, validateRequest, stateController.getByIdWithCities);
-router.get('/:stateId', stateIdParam, validateRequest, stateController.getById);
+// router.get('/:stateId/cities', stateIdParam, validateRequest, stateController.getByIdWithCities);
+// router.get('/:stateId', stateIdParam, validateRequest, stateController.getById);
 
 module.exports = router;

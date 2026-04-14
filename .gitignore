@@ -29,5 +29,5 @@ Desktop.ini
 coverage/
 .nyc_output/
 
-# Optional local uploads (uncomment if you add a disk upload folder)
-# uploads/
+# Uploaded files (local dev)
+uploads/

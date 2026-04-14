@@ -5,7 +5,7 @@ const { listCitiesRules, cityIdParam } = require('../validators/cityValidators')
 
 const router = express.Router();
 
-router.get('/', listCitiesRules, validateRequest, cityController.listByState);
-router.get('/:cityId', cityIdParam, validateRequest, cityController.getById);
+// router.get('/', listCitiesRules, validateRequest, cityController.listByState);
+// router.get('/:cityId', cityIdParam, validateRequest, cityController.getById);
 
 module.exports = router;

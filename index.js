@@ -1,11 +1,10 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const apiRoutes = require('./route');
 const errorHandler = require('./middleware/errorHandler');
 const { sequelize } = require('./models');
-
-const multer = require('multer');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -13,7 +12,7 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(multer().none());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api', apiRoutes);
 

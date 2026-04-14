@@ -22,6 +22,11 @@ const textField = (field, label, max = 250) =>
     .withMessage(`${label} must be between 1 and ${max} characters.`);
 
 const createMemberRules = [
+  /** When present, POST / performs update instead of create (same payload shape). */
+  body('id')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('id must be a positive integer.'),
   body('user_id').optional().isInt({ min: 1 }).withMessage('user_id must be a positive integer.'),
   textField('name', 'name'),
   requiredInt('gender', 'gender'),
@@ -59,6 +64,36 @@ const createMemberRules = [
   requiredInt('order_no', 'order_no'),
   requiredInt('is_vip', 'is_vip'),
   requiredInt('is_private', 'is_private'),
+  /** Optional: create/update `members_detail` in the same request as `members`. */
+  body('detail')
+    .optional()
+    .isObject()
+    .withMessage('detail must be an object.'),
+  body('detail.mobile')
+    .if(body('detail').exists())
+    .trim()
+    .notEmpty()
+    .withMessage('detail.mobile is required when detail is sent.')
+    .isLength({ min: 10, max: 10 })
+    .withMessage('detail.mobile must be exactly 10 digits.')
+    .matches(/^[0-9]+$/)
+    .withMessage('detail.mobile must contain only digits.'),
+  body('detail.email')
+    .if(body('detail').exists())
+    .trim()
+    .notEmpty()
+    .withMessage('detail.email is required when detail is sent.')
+    .isEmail()
+    .withMessage('Please enter a valid detail.email.')
+    .isLength({ max: 50 })
+    .withMessage('detail.email must be at most 50 characters.'),
+  body('detail.about')
+    .if(body('detail').exists())
+    .trim()
+    .notEmpty()
+    .withMessage('detail.about is required when detail is sent.')
+    .isLength({ max: 500 })
+    .withMessage('detail.about must be at most 500 characters.'),
 ];
 
 const updateMemberRules = [
