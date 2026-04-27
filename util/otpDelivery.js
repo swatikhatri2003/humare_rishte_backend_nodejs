@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 /** @deprecated kept for local/testing scripts that still import it */
-const FIXED_OTP = '1234';
+const FIXED_OTP = '123456';
 
 /** Numeric OTP for `email_otp` / `mobile_otp` columns (4–10 chars per validator). */
 function generateOtp(digits = 6) {
@@ -13,10 +13,9 @@ function generateOtp(digits = 6) {
 }
 
 let cachedTransport = null;
-let cachedTransportFailed = false;
+let cachedVerified = false;
 
 function getSmtpTransport() {
-  if (cachedTransportFailed) return null;
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
@@ -27,6 +26,11 @@ function getSmtpTransport() {
       port: Number(process.env.SMTP_PORT) || 587,
       secure: String(process.env.SMTP_SECURE || '').toLowerCase() === 'true',
       auth: { user, pass },
+      tls: {
+        // Keep defaults secure; allow overriding only if you explicitly set it.
+        rejectUnauthorized:
+          String(process.env.SMTP_TLS_REJECT_UNAUTHORIZED || 'true').toLowerCase() === 'true',
+      },
     });
   }
   return cachedTransport;
@@ -43,6 +47,10 @@ async function sendEmailOtp(toAddress, otp) {
   }
 
   try {
+    if (!cachedVerified) {
+      await transport.verify();
+      cachedVerified = true;
+    }
     await transport.sendMail({
       from,
       to: toAddress,
@@ -51,8 +59,8 @@ async function sendEmailOtp(toAddress, otp) {
     });
     return { channel: 'email', delivered: 'smtp' };
   } catch (e) {
-    cachedTransportFailed = true;
-    console.error('SMTP send failed, falling back to console:', e.message);
+    // Don't permanently disable SMTP on first failure (transient network/auth issues can recover).
+    console.error('SMTP send failed, falling back to console:', e && e.message ? e.message : e);
     console.log(`[OTP EMAIL → ${toAddress}] ${otp}`);
     return { channel: 'email', delivered: 'console' };
   }

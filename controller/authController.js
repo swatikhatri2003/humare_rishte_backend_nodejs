@@ -144,6 +144,7 @@ exports.register = asyncHandler(async (req, res) => {
         city_name: cityRow.city_name,
         state_id,
         city_id,
+        village: '',
         status: 1,
         order_no: 1,
         is_vip: 0,

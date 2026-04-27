@@ -22,6 +22,14 @@ const requiredNameField = (field, label) =>
     .isLength({ max: 150 })
     .withMessage(`${label} must be at most 150 characters.`);
 
+/** Matches DB: varchar(150) */
+const optionalTextField = (field, label) =>
+  body(field)
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ max: 150 })
+    .withMessage(`${label} must be at most 150 characters.`);
+
 /** Optional: when present, POST / creates → update existing row (same payload as create). */
 const createKutumbRules = [
   body('kutumb_id')
@@ -50,7 +58,7 @@ const createKutumbRules = [
     .withMessage('city_id is required.')
     .isInt({ min: 1 })
     .withMessage('city_id must be a positive integer.'),
-  optionalInt('village', 'village'),
+  optionalTextField('village', 'village'),
   body('latitude').optional().isLength({ max: 150 }).withMessage('latitude too long.'),
   body('longitude').optional().isLength({ max: 150 }).withMessage('longitude too long.'),
   body('address').optional().isLength({ max: 150 }).withMessage('address too long.'),

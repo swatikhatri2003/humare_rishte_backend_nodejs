@@ -1,33 +1,28 @@
 const express = require('express');
 const memberController = require('../controller/memberController');
-const memberDetailController = require('../controller/memberDetailController');
 const validateRequest = require('../middleware/validateRequest');
 const { requireAuth } = require('../middleware/auth');
 const {
   createMemberRules,
   updateMemberRules,
   memberIdParam,
-  listMembersQuery,
 } = require('../validators/memberValidators');
-const {
-  upsertMemberDetailRules,
-  memberIdForDetailParam,
-} = require('../validators/memberDetailValidators');
+const { createRelativeRules } = require('../validators/memberFamilyValidators');
 
 const router = express.Router();
 
-router.get('/', listMembersQuery, validateRequest, memberController.list);
-router.get('/:memberId/detail', memberIdForDetailParam, validateRequest, memberDetailController.getByMemberId);
-router.put(
-  '/:memberId/detail',
-  requireAuth,
-  memberIdForDetailParam,
-  upsertMemberDetailRules,
-  validateRequest,
-  memberDetailController.upsertByMemberId
-);
-router.get('/:memberId', memberIdParam, validateRequest, memberController.getById);
+// New member APIs (kutumb/vanshavali workflow)
 router.post('/', requireAuth, createMemberRules, validateRequest, memberController.create);
+router.get('/me', requireAuth, memberController.getMyMember);
+router.post(
+  '/:memberId/relative',
+  requireAuth,
+  memberIdParam,
+  createRelativeRules,
+  validateRequest,
+  memberController.addRelative
+);
+router.get('/:memberId/kutumb', memberIdParam, validateRequest, memberController.getKutumbTree);
 router.patch(
   '/:memberId',
   requireAuth,

@@ -1,4 +1,4 @@
-const { Kutumb, Community, State, City, User } = require('../models');
+const { sequelize, Kutumb, Community, State, City, User, Member } = require('../models');
 const AppError = require('../util/AppError');
 const asyncHandler = require('../util/asyncHandler');
 
